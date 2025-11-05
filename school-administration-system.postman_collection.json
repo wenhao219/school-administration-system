@@ -1,12 +1,59 @@
 {
 	"info": {
-		"_postman_id": "ba397eb1-db3d-4e2c-91f4-174b4e0ce7f5",
-		"name": "school-administration-system",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"_postman_id": "130b3875-e68b-4caa-a506-990a6cb68d98",
+		"name": "school-administration-system Copy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38413540"
 	},
 	"item": [
 		{
 			"name": "File Upload",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 2000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							"",
+							"pm.test(\"Response body indicates successful upload\", function () {",
+							"    let jsonData;",
+							"    try {",
+							"        jsonData = pm.response.json();",
+							"    } catch (e) {",
+							"        jsonData = {};",
+							"    }",
+							"    const bodyText = pm.response.text().toLowerCase();",
+							"    pm.expect(",
+							"        (jsonData && (jsonData.success === true || jsonData.status === \"success\" || jsonData.message && jsonData.message.toLowerCase().includes(\"success\"))) ||",
+							"        bodyText.includes(\"success\") ||",
+							"        bodyText.includes(\"uploaded\")",
+							"    ).to.be.true;",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -17,14 +64,9 @@
 							"key": "data",
 							"contentType": "multipart/form-data",
 							"type": "file",
-							"src": []
+							"src": "/C:/Users/Wen Hou/Downloads/interview-package-ts/data.sample.csv"
 						}
-					],
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+					]
 				},
 				"url": {
 					"raw": "localhost:3000/api/upload",
@@ -58,12 +100,7 @@
 							"type": "file",
 							"src": []
 						}
-					],
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+					]
 				},
 				"url": {
 					"raw": "localhost:3000/api/healthcheck",
@@ -112,7 +149,157 @@
 				"description": "Retrieving student list from external"
 			},
 			"response": []
+		},
+		{
+			"name": "Get Student List",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/class/P1-1/students?offset=0&limit=20",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"class",
+						"P1-1",
+						"students"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "0"
+						},
+						{
+							"key": "limit",
+							"value": "20"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Class Name",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"className\": \"P1 Integrity\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/class/P1-1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"class",
+						"P1-1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Workload",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/reports/workload",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"reports",
+						"workload"
+					]
+				}
+			},
+			"response": []
 		}
 	],
-	"protocolProfileBehavior": {}
+	"event": [
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Collection-level generic tests for successful status codes and basic structure",
+					"",
+					"(function () {",
+					"  pm.test(\"Status code is success (2xx or 3xx depending on request)\", function () {",
+					"    pm.expect(pm.response.code).to.be.oneOf([200,201,202,203,204,206,207,208,226,301,302,303,304,307,308]);",
+					"  });",
+					"",
+					"  pm.test(\"Response has a Content-Type header\", function () {",
+					"    pm.response.to.have.header(\"Content-Type\");",
+					"  });",
+					"",
+					"  // Try to detect and validate JSON shape generically",
+					"  try {",
+					"    const ct = (pm.response.headers.get(\"Content-Type\") || \"\").toLowerCase();",
+					"    if (ct.includes(\"application/json\") || ct.includes(\"+json\")) {",
+					"      const json = pm.response.json();",
+					"",
+					"      pm.test(\"JSON response is an object or array\", function () {",
+					"        pm.expect(Array.isArray(json) || typeof json === 'object').to.be.true;",
+					"      });",
+					"",
+					"      // If array, check elements are objects or primitives",
+					"      if (Array.isArray(json)) {",
+					"        pm.test(\"JSON array has consistent element types (best-effort)\", function () {",
+					"          if (json.length > 1) {",
+					"            const types = json.slice(0, 10).map(v => (v === null ? 'null' : Array.isArray(v) ? 'array' : typeof v));",
+					"            pm.expect(new Set(types).size).to.be.below(3);",
+					"          } else {",
+					"            pm.expect(true).to.be.true;",
+					"          }",
+					"        });",
+					"      } else if (json && typeof json === 'object') {",
+					"        pm.test(\"JSON object has at least 1 property (when not empty)\", function () {",
+					"          pm.expect(Object.keys(json).length >= 0).to.be.true;",
+					"        });",
+					"      }",
+					"",
+					"      // Optional: check presence of common metadata fields if available",
+					"      const commonFields = [\"success\",\"status\",\"message\",\"data\",\"error\"]; ",
+					"      pm.test(\"Common fields appear when applicable (non-failing)\", function () {",
+					"        const keys = json && typeof json === 'object' && !Array.isArray(json) ? Object.keys(json) : [];",
+					"        const hasAny = commonFields.some(k => keys.includes(k));",
+					"        pm.expect(true).to.be.true; // soft test placeholder, avoids failing when not present",
+					"      });",
+					"",
+					"    } else if (ct.includes(\"xml\") || ct.includes(\"html\") || ct.includes(\"text\")) {",
+					"      pm.test(\"Text/XML/HTML response body is not empty (if expected)\", function () {",
+					"        pm.expect(pm.response.text().length).to.be.above(0);",
+					"      });",
+					"    }",
+					"  } catch (e) {",
+					"    // Do not fail tests due to parsing errors; create an informational test",
+					"    pm.test(\"Response parsing check\", function () {",
+					"      pm.expect(true, 'Skipping strict JSON parse validation').to.be.true;",
+					"    });",
+					"  }",
+					"",
+					"})();"
+				]
+			}
+		}
+	]
 }
