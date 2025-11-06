@@ -106,9 +106,8 @@ function mergeAndSortStudents(
 const getStudentsHandler: RequestHandler = async (req, res, next) => {
   try {
     const classCode = req.params.classCode;
-    const offset = parseInt(req.query.offset as string, 10) || 0;
-    const limit = parseInt(req.query.limit as string, 10) || 10;
-
+    const offset = parseInt(req.query.offset as string, 10);
+    const limit = parseInt(req.query.limit as string, 10);
     if (!classCode) {
       return res.status(StatusCodes.BAD_REQUEST).send({
         errorCode: 400,
@@ -173,6 +172,28 @@ const getStudentsHandler: RequestHandler = async (req, res, next) => {
   }
 };
 
-StudentController.get("/class/:classCode/students", getStudentsHandler);
+const validateClassCode: RequestHandler = (req, res, next) => {
+  const classCode = req.params.classCode?.trim();
+  if (!classCode) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      errorCode: 400,
+      message: "Class code is required",
+    });
+  }
+  next();
+};
+
+StudentController.get(
+  "/class/:classCode/students",
+  validateClassCode,
+  getStudentsHandler
+);
+
+StudentController.get("/class//students", (req, res) => {
+  return res.status(StatusCodes.BAD_REQUEST).json({
+    errorCode: 400,
+    message: "Class code is required",
+  });
+});
 
 export default StudentController;

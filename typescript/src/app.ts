@@ -12,6 +12,11 @@ App.use(cors());
 App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({ extended: true }));
 
+App.use((req, res, next) => {
+  req.url = req.url.replace(/\/{2,}/g, "/");
+  next();
+});
+
 App.use("/api", router);
 App.use(globalErrorHandler);
 
