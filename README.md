@@ -1,6 +1,6 @@
 ## Prerequisites
 
-- NodeJS v12.x.x
+- NodeJS v20.17.0
 - Docker
 
 <br>
