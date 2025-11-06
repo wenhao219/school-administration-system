@@ -3,7 +3,6 @@ import csv from "csv-parser";
 import { convertCsvToJson } from "../index";
 import { CsvItem } from "../../types/CsvItem";
 
-// Mock fs and csv-parser
 jest.mock("fs");
 jest.mock("csv-parser");
 
@@ -46,13 +45,10 @@ describe("convertCsvToJson", () => {
       },
     ];
 
-    // Simulate the stream events
     mockReadStream.on.mockImplementation((event: string, handler: Function) => {
       if (event === "data") {
-        // Simulate data events
         mockCsvData.forEach((item) => handler(item));
       } else if (event === "end") {
-        // Simulate end event
         setTimeout(() => handler(), 0);
       }
       return mockReadStream;

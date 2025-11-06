@@ -4,14 +4,12 @@ import ClassController from "../ClassController";
 import { StatusCodes } from "http-status-codes";
 import { Class } from "../../models";
 
-// Mock the Class model
 jest.mock("../../models", () => ({
   Class: {
     findOne: jest.fn(),
   },
 }));
 
-// Mock Logger
 jest.mock("../../config/logger", () => {
   return jest.fn().mockImplementation(() => ({
     info: jest.fn(),
@@ -61,8 +59,6 @@ describe("ClassController", () => {
         .put("/api/class/")
         .send({ className: "New Name" })
         .expect(StatusCodes.NOT_FOUND);
-
-      // Express router treats empty path as not found
     });
 
     it("should return 400 when className is missing", async () => {

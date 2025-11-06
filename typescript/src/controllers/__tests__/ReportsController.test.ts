@@ -4,7 +4,6 @@ import ReportsController from "../ReportsController";
 import { StatusCodes } from "http-status-codes";
 import { Enrollment, Teacher, Subject } from "../../models";
 
-// Mock dependencies
 jest.mock("../../models", () => ({
   Enrollment: {
     findAll: jest.fn(),
@@ -13,7 +12,6 @@ jest.mock("../../models", () => ({
   Subject: {},
 }));
 
-// Mock Logger
 jest.mock("../../config/logger", () => {
   return jest.fn().mockImplementation(() => ({
     info: jest.fn(),
@@ -103,7 +101,6 @@ describe("ReportsController", () => {
       expect(response.body["Teacher A"]).toBeDefined();
       expect(response.body["Teacher B"]).toBeDefined();
 
-      // Teacher A teaches MATH in 2 classes and ENG in 1 class
       const teacherAWorkload = response.body["Teacher A"];
       expect(Array.isArray(teacherAWorkload)).toBe(true);
       expect(teacherAWorkload.length).toBe(2);
@@ -120,7 +117,6 @@ describe("ReportsController", () => {
       expect(engSubject).toBeDefined();
       expect(engSubject.numberOfClasses).toBe(1);
 
-      // Teacher B teaches MATH in 1 class
       const teacherBWorkload = response.body["Teacher B"];
       expect(teacherBWorkload.length).toBe(1);
       expect(teacherBWorkload[0].subjectCode).toBe("MATH");
@@ -167,7 +163,6 @@ describe("ReportsController", () => {
     });
 
     it("should count unique classes per teacher-subject combination", async () => {
-      // Same classId appears multiple times (should be counted once)
       const mockEnrollments = [
         {
           teacherId: 1,
@@ -186,7 +181,7 @@ describe("ReportsController", () => {
         {
           teacherId: 1,
           subjectId: 1,
-          classId: 1, // Same class
+          classId: 1,
           teacher: {
             id: 1,
             name: "Teacher A",
@@ -200,7 +195,7 @@ describe("ReportsController", () => {
         {
           teacherId: 1,
           subjectId: 1,
-          classId: 2, // Different class
+          classId: 2,
           teacher: {
             id: 1,
             name: "Teacher A",
@@ -222,7 +217,6 @@ describe("ReportsController", () => {
       const mathSubject = response.body["Teacher A"].find(
         (s: any) => s.subjectCode === "MATH"
       );
-      // Should count 2 unique classes, not 3 enrollments
       expect(mathSubject.numberOfClasses).toBe(2);
     });
 
@@ -232,7 +226,7 @@ describe("ReportsController", () => {
           teacherId: 1,
           subjectId: 1,
           classId: 1,
-          teacher: null, // Missing teacher
+          teacher: null,
           subject: {
             id: 1,
             code: "MATH",
@@ -261,7 +255,6 @@ describe("ReportsController", () => {
         .get("/api/reports/workload")
         .expect(StatusCodes.OK);
 
-      // Should only include Teacher B
       expect(response.body).not.toHaveProperty("null");
       expect(response.body["Teacher B"]).toBeDefined();
     });
@@ -276,7 +269,7 @@ describe("ReportsController", () => {
             id: 1,
             name: "Teacher A",
           },
-          subject: null, // Missing subject
+          subject: null,
         },
         {
           teacherId: 1,
@@ -300,7 +293,6 @@ describe("ReportsController", () => {
         .get("/api/reports/workload")
         .expect(StatusCodes.OK);
 
-      // Should only include ENG subject
       const teacherAWorkload = response.body["Teacher A"];
       expect(teacherAWorkload.length).toBe(1);
       expect(teacherAWorkload[0].subjectCode).toBe("ENG");
@@ -389,4 +381,3 @@ describe("ReportsController", () => {
     });
   });
 });
-

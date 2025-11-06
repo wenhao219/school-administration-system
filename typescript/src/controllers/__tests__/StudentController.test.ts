@@ -5,7 +5,6 @@ import { StatusCodes } from "http-status-codes";
 import { Student, Enrollment, Class } from "../../models";
 import axios from "axios";
 
-// Mock dependencies
 jest.mock("../../models", () => ({
   Student: {},
   Enrollment: {
@@ -19,7 +18,6 @@ jest.mock("../../models", () => ({
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-// Mock Logger
 jest.mock("../../config/logger", () => {
   return jest.fn().mockImplementation(() => ({
     info: jest.fn(),
@@ -246,7 +244,6 @@ describe("StudentController", () => {
         .query({ offset: 0, limit: 10 })
         .expect(StatusCodes.OK);
 
-      // Students should be sorted by name (Alice, Bob, Zebra)
       expect(response.body.students[0].name).toBe("Alice Smith");
       expect(response.body.students[1].name).toBe("Bob Johnson");
       expect(response.body.students[2].name).toBe("Zebra Adams");
@@ -313,7 +310,6 @@ describe("StudentController", () => {
         .query({ offset: 0, limit: 10 })
         .expect(StatusCodes.OK);
 
-      // Should still return internal students even if external API fails
       expect(response.body.students).toHaveLength(1);
       expect(response.body.students[0].name).toBe("Alice Smith");
     });
@@ -344,7 +340,6 @@ describe("StudentController", () => {
         name: "Class 1",
       };
 
-      // Same student in multiple enrollments
       const mockEnrollments = [
         {
           student: {
@@ -376,7 +371,6 @@ describe("StudentController", () => {
         .query({ offset: 0, limit: 10 })
         .expect(StatusCodes.OK);
 
-      // Should only return one instance of Alice
       expect(response.body.students).toHaveLength(1);
     });
   });

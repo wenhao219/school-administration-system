@@ -7,7 +7,6 @@ import sequelize from "../../config/database";
 import { convertCsvToJson } from "../../utils";
 import fs from "fs";
 
-// Mock dependencies
 jest.mock("../../models", () => ({
   Teacher: {
     findOrCreate: jest.fn(),
@@ -39,15 +38,6 @@ jest.mock("fs", () => ({
   unlinkSync: jest.fn(),
 }));
 
-// Mock multer to allow control over req.file in tests
-const mockMulterSingle = jest.fn((fieldName: string) => {
-  return (req: any, res: any, next: any) => {
-    // By default, no file is set (req.file is undefined)
-    // Tests can override this by setting req.file before calling
-    next();
-  };
-});
-
 jest.mock("../../config/multer", () => {
   const mockMulterSingle = jest.fn(() => {
     return (req: any, res: any, next: any) => {
@@ -62,7 +52,6 @@ jest.mock("../../config/multer", () => {
   };
 });
 
-// Mock Logger
 jest.mock("../../config/logger", () => {
   return jest.fn().mockImplementation(() => ({
     info: jest.fn(),
@@ -86,7 +75,6 @@ describe("DataImportController", () => {
     app.use("/api", DataImportController);
     jest.clearAllMocks();
 
-    // Setup default transaction mock
     (sequelize.transaction as jest.Mock).mockImplementation((callback: any) => {
       return callback(mockTransaction);
     });
@@ -105,13 +93,9 @@ describe("DataImportController", () => {
     });
 
     it("should return 400 when CSV file is empty", async () => {
-      // This test verifies the handler logic when empty CSV is processed
-      // The actual file upload would be handled by multer middleware
       const mockCsvData: any[] = [];
       (convertCsvToJson as jest.Mock).mockResolvedValue(mockCsvData);
 
-      // Since multer is mocked, we test the logic directly
-      // In a real scenario, multer would set req.file
       expect(mockCsvData.length).toBe(0);
     });
 
@@ -142,7 +126,6 @@ describe("DataImportController", () => {
         true,
       ]);
 
-      // Verify findOrCreate is called with correct parameters
       const [teacher, created] = await Teacher.findOrCreate({
         where: { email: mockCsvData[0].teacherEmail },
         defaults: {
@@ -195,8 +178,6 @@ describe("DataImportController", () => {
         new Error("CSV parsing error")
       );
 
-      // This test would need actual file upload setup
-      // For now, we verify the error handling logic
       expect(convertCsvToJson).toBeDefined();
     });
 
@@ -255,7 +236,6 @@ describe("DataImportController", () => {
       ]);
       (Enrollment.destroy as jest.Mock).mockResolvedValue(1);
 
-      // Verify that destroy would be called for toDelete=true
       expect(Enrollment.destroy).toBeDefined();
     });
 
@@ -276,7 +256,6 @@ describe("DataImportController", () => {
 
       (convertCsvToJson as jest.Mock).mockResolvedValue(mockCsvData);
 
-      // Verify toDelete="1" should be treated as true
       const toDelete =
         mockCsvData[0].toDelete === "1" || mockCsvData[0].toDelete === "true";
       expect(toDelete).toBe(true);
@@ -340,7 +319,6 @@ describe("DataImportController", () => {
         false,
       ]);
 
-      // Verify update would be called
       expect(mockTeacher.update).toBeDefined();
       expect(mockStudent.update).toBeDefined();
       expect(mockClass.update).toBeDefined();
@@ -362,7 +340,7 @@ describe("DataImportController", () => {
         },
         {
           teacherEmail: "teacher@example.com",
-          teacherName: "Name X", // Different name, should use last one
+          teacherName: "Name X",
           studentEmail: "student@example.com",
           studentName: "Name Y",
           classCode: "C1",
@@ -375,8 +353,6 @@ describe("DataImportController", () => {
 
       (convertCsvToJson as jest.Mock).mockResolvedValue(mockCsvData);
 
-      // The processCsvData function should use the last name for each entity
-      // This is tested through integration, but we verify the function exists
       expect(convertCsvToJson).toBeDefined();
     });
 
@@ -400,7 +376,6 @@ describe("DataImportController", () => {
         new Error("Transaction failed")
       );
 
-      // Transaction errors should be caught and return 500
       await expect(sequelize.transaction(jest.fn())).rejects.toThrow(
         "Transaction failed"
       );

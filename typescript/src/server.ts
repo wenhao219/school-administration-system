@@ -2,7 +2,7 @@ import "dotenv/config";
 import sequelize from "./config/database";
 import Logger from "./config/logger";
 import App from "./app";
-import "./models"; // Import models to register them with Sequelize
+import "./models";
 
 const MAX_RETRY = 20;
 const LOG = new Logger("server.js");

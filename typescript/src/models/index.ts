@@ -4,7 +4,6 @@ import Class from "./Class";
 import Subject from "./Subject";
 import Enrollment from "./Enrollment";
 
-// Define associations
 Teacher.hasMany(Enrollment, {
   foreignKey: "teacherId",
   as: "enrollments",
